@@ -28,12 +28,20 @@ jobs:
 
       - name: Patch identity
         run: |
+          set +e
           MAN=android/app/src/main/AndroidManifest.xml
+          GRADLE=""
+          for f in android/app/build.gradle.kts android/app/build.gradle; do
+            [ -f "$f" ] && GRADLE="$f" && break
+          done
+          echo "gradle file = $GRADLE"
           sed -i 's/android:label="qi_duiyi"/android:label="棋·对弈"/' $MAN
-          # 关键：强制 applicationId / namespace 改为 com.qi.duiyi
-          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' android/app/build.gradle.kts
-          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' $MAN || true
-          grep -n 'applicationId\|namespace' android/app/build.gradle.kts || true
+          if [ -n "$GRADLE" ]; then
+            sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' "$GRADLE"
+            echo "--- gradle identity ---"
+            grep -n 'applicationId\|namespace' "$GRADLE"
+          fi
+          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' $MAN
           OLD=android/app/src/main/kotlin/com/qi/qi_duiyi
           if [ -d "$OLD" ]; then
             mkdir -p android/app/src/main/kotlin/com/qi/duiyi
@@ -42,7 +50,9 @@ jobs:
             rmdir $OLD
           fi
           grep -q VIBRATE $MAN || sed -i 's#<application#<uses-permission android:name="android.permission.VIBRATE"/>\n    <application#' $MAN
-          cat $MAN || true
+          echo "--- manifest ---"
+          cat $MAN
+          exit 0
 
       - name: Build
         run: |
