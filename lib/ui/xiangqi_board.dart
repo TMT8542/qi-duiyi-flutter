@@ -15,6 +15,8 @@ class _XiangqiBoardState extends State<XiangqiBoard> {
   int? selRow;
   int? selCol;
   List<Move> moves = const [];
+  Offset? _downPos;
+  DateTime? _downAt;
 
   void _tapCell(int r, int c) {
     if (game.winner != null) return;
@@ -103,13 +105,29 @@ class _XiangqiBoardState extends State<XiangqiBoard> {
                 child: SizedBox(
                   width: cell * 9.4,
                   height: cell * 10.4,
-                  child: GestureDetector(
-                    onTapUp: (d) {
-                      final c = ((d.localPosition.dx - cell * 0.2) / cell).round();
-                      final r = ((d.localPosition.dy - cell * 0.2) / cell).round();
-                      if (r >= 0 && r < 10 && c >= 0 && c < 9) {
-                        _tapCell(r, c);
+                  child: Listener(
+                    behavior: HitTestBehavior.translucent,
+                    onPointerDown: (e) {
+                      _downPos = e.localPosition;
+                      _downAt = DateTime.now();
+                    },
+                    onPointerUp: (e) {
+                      final d = (_downPos == null)
+                          ? 999.0
+                          : (e.localPosition - _downPos!).distance;
+                      final ms = _downAt == null
+                          ? 999
+                          : DateTime.now().difference(_downAt!).inMilliseconds;
+                      // 位移小于 12px 且时间短于 400ms 才算点击，避免与横向拖动冲突
+                      if (d < 12 && ms < 400) {
+                        final c = ((e.localPosition.dx - cell * 0.2) / cell).round();
+                        final r = ((e.localPosition.dy - cell * 0.2) / cell).round();
+                        if (r >= 0 && r < 10 && c >= 0 && c < 9) {
+                          _tapCell(r, c);
+                        }
                       }
+                      _downPos = null;
+                      _downAt = null;
                     },
                     child: CustomPaint(
                       painter: _XqPainter(

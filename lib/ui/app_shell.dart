@@ -52,23 +52,30 @@ class _AppShellState extends State<AppShell> with SingleTickerProviderStateMixin
             _Header(controller: c),
             const SizedBox(height: 10),
             Expanded(
-              child: ClipRect(
-                child: ListenableBuilder(
-                  listenable: c,
-                  builder: (context, _) {
-                    return Transform.translate(
-                      offset: Offset(-c.offsetPx, 0),
-                      child: SizedBox(
-                        width: width * widget.pages.length,
-                        child: Row(
-                          children: [
-                            for (final p in widget.pages)
-                              SizedBox(width: width, child: p),
-                          ],
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onHorizontalDragStart: c.onDragStart,
+                onHorizontalDragUpdate: c.onDragUpdate,
+                onHorizontalDragEnd: c.onDragEnd,
+                onHorizontalDragCancel: c.onDragCancel,
+                child: ClipRect(
+                  child: ListenableBuilder(
+                    listenable: c,
+                    builder: (context, _) {
+                      return Transform.translate(
+                        offset: Offset(-c.offsetPx, 0),
+                        child: SizedBox(
+                          width: width * widget.pages.length,
+                          child: Row(
+                            children: [
+                              for (final p in widget.pages)
+                                SizedBox(width: width, child: p),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
