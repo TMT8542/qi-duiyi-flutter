@@ -30,7 +30,10 @@ jobs:
         run: |
           MAN=android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label="qi_duiyi"/android:label="棋·对弈"/' $MAN
-          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' android/app/build.gradle.kts $MAN 2>/dev/null || true
+          # 关键：强制 applicationId / namespace 改为 com.qi.duiyi
+          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' android/app/build.gradle.kts
+          sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' $MAN || true
+          grep -n 'applicationId\|namespace' android/app/build.gradle.kts
           OLD=android/app/src/main/kotlin/com/qi/qi_duiyi
           if [ -d "$OLD" ]; then
             mkdir -p android/app/src/main/kotlin/com/qi/duiyi
