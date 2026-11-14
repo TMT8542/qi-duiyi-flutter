@@ -33,7 +33,7 @@ jobs:
           # 关键：强制 applicationId / namespace 改为 com.qi.duiyi
           sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' android/app/build.gradle.kts
           sed -i 's#com\.qi\.qi_duiyi#com.qi.duiyi#g' $MAN || true
-          grep -n 'applicationId\|namespace' android/app/build.gradle.kts
+          grep -n 'applicationId\|namespace' android/app/build.gradle.kts || true
           OLD=android/app/src/main/kotlin/com/qi/qi_duiyi
           if [ -d "$OLD" ]; then
             mkdir -p android/app/src/main/kotlin/com/qi/duiyi
@@ -42,7 +42,7 @@ jobs:
             rmdir $OLD
           fi
           grep -q VIBRATE $MAN || sed -i 's#<application#<uses-permission android:name="android.permission.VIBRATE"/>\n    <application#' $MAN
-          cat $MAN
+          cat $MAN || true
 
       - name: Build
         run: |
