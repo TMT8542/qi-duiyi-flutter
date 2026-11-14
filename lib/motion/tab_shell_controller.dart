@@ -31,9 +31,6 @@ class TabShellController extends ChangeNotifier {
   bool _dragging = false;
   bool get isDragging => _dragging;
 
-  final VelocityTracker _tracker =
-      VelocityTracker.withKind(PointerDeviceKind.touch);
-
   void _onTick() {
     _offsetPx = _controller.value;
     notifyListeners();
@@ -88,13 +85,11 @@ class TabShellController extends ChangeNotifier {
     _dragging = true;
     _dragStartX = d.localPosition.dx;
     _dragStartOffset = _offsetPx;
-    _tracker.addPosition(d.timestamp ?? Duration.zero, d.localPosition);
     HapticFeedback.selectionClick();
   }
 
   void onDragUpdate(DragUpdateDetails d) {
     if (!_dragging) return;
-    _tracker.addPosition(d.timestamp ?? Duration.zero, d.localPosition);
     final dx = d.localPosition.dx - _dragStartX;
     double next = _dragStartOffset - dx;
     final max = _totalWidth;
