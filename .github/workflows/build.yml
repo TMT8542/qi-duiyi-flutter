@@ -24,7 +24,17 @@ jobs:
 
       - name: Generate android shell
         run: |
+          # 备份我们自己的代码，flutter create 会覆盖 lib/ 与 pubspec.yaml
+          rm -rf /tmp/keep && mkdir -p /tmp/keep
+          cp -r lib /tmp/keep/lib
+          cp pubspec.yaml /tmp/keep/pubspec.yaml
           flutter create --platforms=android --org com.qi --project-name qi_duiyi --overwrite .
+          # 还原我们的代码
+          rm -rf lib && cp -r /tmp/keep/lib lib
+          cp /tmp/keep/pubspec.yaml pubspec.yaml
+          echo "--- restored lib ---"
+          ls -R lib
+          head -12 lib/main.dart
 
       - name: Patch identity
         run: |
